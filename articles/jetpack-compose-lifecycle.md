@@ -70,7 +70,7 @@ MyAppScreen
 
 Compose は、状態の読み取り位置から最も近い親のスコープを見つけて再コンポーズを行います。
 
-上記の例では、状態である `count` は `CountText` の引数として渡されているため、そこから最も近い親のスコープである `MyAppScreen` が再コンポーズされています。
+上記の例だと、状態である `count` は `CountText` の引数として渡されているため、そこから最も近い親のスコープである `MyAppScreen` が再コンポーズされています。
 
 :::details 注意： Column は inline 関数として定義されており restartable でないコンポーザブルのため、スコープとしては機能しません。再コンポーズされる場合は親コンポーザブルも再コンポーズされます。
 https://developer.android.com/jetpack/compose/performance/stability?hl=ja#functions
@@ -81,7 +81,7 @@ https://developer.android.com/jetpack/compose/performance/stability?hl=ja#functi
 
 次に状態の読み取りを子コンポーザブルに移動して、再コンポーズされる範囲を抑えてみます。
 
-以下は `CountText` に渡している引数をIntではなく、ラムダに変更した例です。
+以下は、 `CountText` に渡している引数を Int ではなくラムダに変更した例です。
 
 ```kotlin
 @Composable
@@ -127,11 +127,11 @@ MyAppScreen
 
 次はラムダ版のModifierについて見ていきます。その前に Jetpack Compose の3つのフェーズについて軽く触れておきます。
 
-Compose では、以下のような役割が異なる3つのフェーズを経てUIが表示されます。
+Compose では、以下のように役割が異なる3つのフェーズを経てUIが表示されます。
 
 1. Composition → 何を表示するかを決める
 2. Layout → どこに配置するかを決める
-3. Drawing → どのように描画するか決める
+3. Drawing → どのように描画するかを決める
 
 ![](/images/jetpack-compose-lifecycle/compose-three-phases.png)
 
