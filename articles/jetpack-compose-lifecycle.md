@@ -203,7 +203,7 @@ fun Modifier.offset(x: Dp = 0.dp, y: Dp = 0.dp): Modifier
 fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
     SideEffect {Log.d("compose-log", "CountText")}
     Text(
-        modifier = Modifier.offset { IntOffset(xOffsetProvider(), 0) },形式の offset を使う
+        modifier = Modifier.offset { IntOffset(xOffsetProvider(), 0) },
         text = "Count ${countProvider()}"
     )
 }
