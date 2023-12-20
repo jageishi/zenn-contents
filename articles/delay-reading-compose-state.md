@@ -2,7 +2,7 @@
 title: "【Jetpack Compose】状態の読み取りを遅延してパフォーマンスを向上させる"
 emoji: "📚"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["Android", "Jetpack Compose"]
+topics: ["android", "jetpackcompose"]
 published: false
 ---
 
