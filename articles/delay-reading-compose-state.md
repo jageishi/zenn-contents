@@ -3,7 +3,7 @@ title: "【Jetpack Compose】状態の読み取りを遅延してパフォーマ
 emoji: "📚"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["android", "jetpackcompose"]
-published: false
+published: true
 ---
 
 この記事は [RNIアドベントカレンダー2023](https://rni-dev.hatenablog.com/entry/2023/12/19/172817) 2日目の記事です。
