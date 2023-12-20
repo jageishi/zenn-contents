@@ -57,7 +57,7 @@ fun CountText(count: Int) {
 
 `CountText` の引数として `count` を渡しているため、ボタンがタップされて`count` の値が変更されると、それに応じて `MyAppScreen` と `CountText` が再コンポーズされ表示が更新されます。一方で、`Button` は引数に変更がないため再コンポーズはスキップされています。
 
-![](/images/jetpack-compose-lifecycle/compose-log1.gif)
+![](/images/delay-reading-compose-state/compose-log1.gif)
 
 ### 再コンポーズのスコープについて
 
@@ -127,7 +127,7 @@ MyAppScreen
 
 こうすることで、`count` が変更されたときに状態を読み取っている箇所から最も近いスコープである `CountText` が再コンポーズされるだけで済みます。
 
-![](/images/jetpack-compose-lifecycle/compose-log2.gif)
+![](/images/delay-reading-compose-state/compose-log2.gif)
 
 ## ラムダ版のModifierを使ってフェーズをスキップする
 
@@ -139,7 +139,7 @@ Compose では、以下のように役割が異なる3つのフェーズを経�
 2. Layout → どこに配置するかを決める
 3. Drawing → どのように描画するかを決める
 
-![](/images/jetpack-compose-lifecycle/compose-three-phases.png)
+![](/images/delay-reading-compose-state/compose-three-phases.png)
 
 https://developer.android.com/jetpack/compose/phases?hl=ja
 
@@ -186,7 +186,7 @@ fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
 }
 ```
 
-![](/images/jetpack-compose-lifecycle/compose-log3.gif)
+![](/images/delay-reading-compose-state/compose-log3.gif)
 
 これだとスライダーを動かすたびに `CountText` が再コンポーズされてしまいます。
 
@@ -213,7 +213,7 @@ fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
 }
 ```
 
-![](/images/jetpack-compose-lifecycle/compose-log4.gif)
+![](/images/delay-reading-compose-state/compose-log4.gif)
 
 スライダーを動かしてもログが出力されなくなったのは、`Modifier.offset` に渡されたラムダが Layout フェーズで参照されるためです。これにより、状態の読み取りが Layout フェーズまで遅延され、Composition フェーズがスキップされます。
 
