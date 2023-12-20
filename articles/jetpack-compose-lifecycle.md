@@ -6,9 +6,13 @@ topics: ["Android", "Jetpack Compose"]
 published: false
 ---
 
-皆さんは Jetpack Compose を使っていますか？ Compose は Android アプリ開発者の間で広く浸透してきて、多くの方が利用しているのではないかと思います。私自身も業務で使っており、その恩恵を日々実感しています。
+この記事は [RNIアドベントカレンダー2023](https://rni-dev.hatenablog.com/entry/2023/12/19/172817) 2日目の記事です。
 
-Compose は非常に強力なツールですが、パフォーマンスの向上に関してはテクニックが必要だったりします。方法はいくつか存在しますが、今回は状態の読み取りを遅延させる手法について紹介していきたいと思います。
+## はじめに
+
+皆さんは Jetpack Compose を使っていますか？ Compose は Android アプリ開発者の間で広く浸透してきていて、多くの方が利用しているのではないかと思います。私自身も業務で使っており、その恩恵を日々実感しています。
+
+Compose は非常に強力なツールですが、パフォーマンス周りに関しては少しテクニックが必要だったりします。方法はいくつか存在しますが、今回は状態の読み取りを遅延させる手法について紹介したいと思います。
 
 ## 再コンポーズについて
 
@@ -20,9 +24,9 @@ Compose は非常に強力なツールですが、パフォーマンスの向上
 
 https://developer.android.com/jetpack/compose/mental-model?hl=ja#recomposition
 
-Compose は [State](https://developer.android.com/reference/kotlin/androidx/compose/runtime/State) の変更を観測します。再コンポーズは、 [State#value](https://developer.android.com/reference/kotlin/androidx/compose/runtime/State#value()) が参照されており、かつその値が変更された場合に発生します。
+Jetpack Compose は [State](https://developer.android.com/reference/kotlin/androidx/compose/runtime/State) の変更を監視します。再コンポーズは、 [State#value](https://developer.android.com/reference/kotlin/androidx/compose/runtime/State#value()) が参照されている状態でその値が変更された場合にトリガーされます。
 
-以下はボタンをタップしてカウントアップするコンポーザブルです。
+次に示すのは、ボタンをタップすることでカウントアップするコンポーザブルの例です。
 
 ```kotlin
 @Composable
@@ -51,7 +55,7 @@ fun CountText(count: Int) {
 }
 ```
 
-`CountText` の引数として `count` を渡しているため、`count` が変更されると表示を更新するために `MyAppScreen` が再コンポーズされます。
+`CountText` の引数として `count` を渡しているため、ボタンがタップされて`count` の値が変更されると、それに応じて `MyAppScreen` と `CountText` が再コンポーズされ表示が更新されます。一方で、`Button` は引数に変更がないため再コンポーズはスキップされています。
 
 ![](/images/jetpack-compose-lifecycle/compose-log1.gif)
 
@@ -70,7 +74,7 @@ MyAppScreen
 
 Compose は、状態の読み取り位置から最も近い親のスコープを見つけて再コンポーズを行います。
 
-上記の例だと、状態である `count` は `CountText` の引数として渡されているため、そこから最も近い親のスコープである `MyAppScreen` が再コンポーズされています。
+上記の例だと、状態である `count` は `CountText` の引数として渡されているため、そこから最も近い親のスコープである `MyAppScreen` が再コンポーズのルートになります。
 
 :::details 注意： Column は inline 関数として定義されており restartable でないコンポーザブルのため、スコープとしては機能しません。再コンポーズされる場合は親コンポーザブルも再コンポーズされます。
 https://developer.android.com/jetpack/compose/performance/stability?hl=ja#functions
@@ -79,7 +83,7 @@ https://developer.android.com/jetpack/compose/performance/stability?hl=ja#functi
 
 ## 状態の読み取りを子コンポーザブルに移動する
 
-次に状態の読み取りを子コンポーザブルに移動して、再コンポーズされる範囲を抑えてみます。
+次に状態の読み取りを子コンポーザブルに移動して、再コンポーズされる範囲を狭めてみます。
 
 以下は、 `CountText` に渡している引数を Int ではなくラムダに変更した例です。
 
@@ -93,7 +97,7 @@ fun MyAppScreen() {
             .fillMaxSize()
             .wrapContentSize()
     ) {
-        CountText(countProvider = { count })
+        CountText(countProvider = { count }) // 引数をラムダに変更
         Button(onClick = { count++ }) {
             SideEffect { Log.d("compose-log", "Button") }
             Text(text = "Count Up")
@@ -127,7 +131,7 @@ MyAppScreen
 
 ## ラムダ版のModifierを使ってフェーズをスキップする
 
-次はラムダ版のModifierについて見ていきます。その前に Jetpack Compose の3つのフェーズについて軽く触れておきます。
+次はラムダ版のModifierについて見ていきます。が、その前に Jetpack Compose の3つのフェーズについて軽く触れておきます。
 
 Compose では、以下のように役割が異なる3つのフェーズを経てUIが表示されます。
 
@@ -139,9 +143,9 @@ Compose では、以下のように役割が異なる3つのフェーズを経�
 
 https://developer.android.com/jetpack/compose/phases?hl=ja
 
-「どこに配置するか」や「どのように描画するか」のみを変更する場合は、ラムダ版Modifierを使って状態の読み取りを遅延させることで、フェーズをスキップすることができます。
+「どこに配置するか」や「どのように描画するか」のみを変更する場合は、ラムダ版のModifierを使って状態の読み取りを遅延させることで、フェーズをスキップすることができます。
 
-以下は `Slider` を使って `CountText` の表示位置を移動できるコンポーザブルです。
+以下は `Slider` を使って `CountText` の表示位置を移動するコンポーザブルです。
 
 ```kotlin
 @Composable
@@ -211,9 +215,11 @@ fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
 
 ![](/images/jetpack-compose-lifecycle/compose-log4.gif)
 
-スライダーを動かしてもログが出力されなくなりました。`Modifier.offset` に渡したラムダは Layout フェーズで参照されます。つまり、状態の読み取りが Layout フェーズまで遅延されるため、Composition フェーズがスキップされます。
+スライダーを動かしてもログが出力されなくなったのは、`Modifier.offset` に渡されたラムダが Layout フェーズで参照されるためです。これにより、状態の読み取りが Layout フェーズまで遅延され、Composition フェーズがスキップされます。
 
-ラムダを渡すことでフェーズをスキップできる Modifier は他にも以下のようなものがあります。
+値が頻繁に変更される場合には、ラムダを使用するModifierの方が適していることが多そうですね。
+
+また、ラムダを渡すことでフェーズをスキップできる Modifier は他にも以下のようなものがあります。
 
 - [absoluteOffset](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).absoluteOffset(kotlin.Function1))
 - [graphicsLayer](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).graphicsLayer(kotlin.Function1))
@@ -221,12 +227,12 @@ fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
 
 ## おわりに
 
-以上、状態の読み取りを遅延させる方法についてでした。
-今回紹介した方法が実際に効果を発揮するかどうかは、状況によって異なります。また、パフォーマンスの早すぎる最適化は徒労に終わってしまうこともあるため、まずは基本的な対応に留めておき、問題が生じた際にはボトルネックとなっている箇所を特定して対応していくのが効率的だと思います。
-今回紹介したような方法を頭の片隅に置いておくと、そのような時にとれる選択肢が増えるかもしれません。
+以上、状態の読み取りを遅延させる方法について紹介しました。
+今回の方法が実際に効果を発揮するかどうかは、状況によって異なります。また、パフォーマンスの早すぎる最適化は徒労に終わってしまうどころか、保守コストを増加させてしまうこともあると思います。ですので、まずは基本的な対応に留めておき、問題が生じた際にはボトルネックとなっている箇所を特定して対応していくのが効率的だと思います。
+今回紹介したような方法を記憶に留めておくと、必要な時にとれる選択肢が増えるかもしれません。
 
 ## 参考記事
 
-- [Jetpack Compose のフェーズ  \|  Android Developers](https://developer.android.com/jetpack/compose/phases?hl=ja)
-- [Performance With Jetpack Compose — Part 1 \| by Udit Verma \| ProAndroidDev](https://proandroiddev.com/performance-with-jetpack-compose-part-1-4867882949e7)
-- [おすすめの方法を実践する  \|  Jetpack Compose  \|  Android Developers](https://developer.android.com/jetpack/compose/performance/bestpractices?hl=ja)
+- https://developer.android.com/jetpack/compose/phases?hl=ja
+- https://proandroiddev.com/performance-with-jetpack-compose-part-1-4867882949e7
+- https://developer.android.com/jetpack/compose/performance/bestpractices?hl=ja
