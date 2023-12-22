@@ -224,6 +224,7 @@ fun CountText(countProvider: () -> Int, xOffsetProvider: () -> Int) {
 - [absoluteOffset](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).absoluteOffset(kotlin.Function1))
 - [graphicsLayer](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).graphicsLayer(kotlin.Function1))
 - [drawBehind](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier#(androidx.compose.ui.Modifier).drawBehind(kotlin.Function1))
+- etc.
 
 ## おわりに
 
